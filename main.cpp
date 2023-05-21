@@ -312,7 +312,7 @@ int main()
                 text[0].setString(message[1]);
             }
             std:: stringstream ss;
-            ss << score;                        // <----
+            ss << score;                        // <---- TO BE COMMENTED AS NEEDED
             text[1].setString(ss.str());
 
             // Branches
