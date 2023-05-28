@@ -1,6 +1,13 @@
 {
+<<<<<<< HEAD
     "C_Cpp.default.configurationProvider": "ms-vscode.makefile-tools",
     "files.associations": {
         "sstream": "cpp"
     }
+=======
+    "files.associations": {
+        "*.tpp": "cpp"
+    },
+    "terminal.integrated.shell.windows": "cmd.exe"
+>>>>>>> e972223e1af78a96e87bc5dba4363c93db622c1f
 }
