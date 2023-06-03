@@ -1,6 +1,7 @@
+#include <sstream>
 #include <iostream>
 #include <SFML/Graphics.hpp>
-#include <sstream>
+#include <SFML/Audio.hpp>
 
 
 using namespace sf;
@@ -14,15 +15,11 @@ int GetRandomSpeed(int fromRange, int toRange)
     return rnd;
 }
 
-// void setOriginToMiddle(Drawable &obj)
-// (
-    
-// )
 
 const int NUM_BRANCHES = 6;
 enum class side { LEFT, RIGHT, NONE};
 side branchesPositions[NUM_BRANCHES];
-void UpdateBranches(int seed);
+void GenerateRandomBranches(int seed);
 int main()
 {
     
@@ -33,14 +30,16 @@ int main()
     // Variables GENERAL
     Vector2f defScale(0.73f, 0.70f); // Scale to all textures
     Vector2f treesScale(0.46f, 0.65);
+    Vector2f axeScale(0.34, 0.34);
     side playerSide = side::LEFT;
-    const float AXE_POS_LEFT = 400;
+    const float AXE_POS_LEFT = 585;
     const float AXE_POS_RIGHT = 800;
     float logXSpeed = 700;
     float logYSpeed =  -1100;
     bool logActive = false;
     bool acceptInput = true;
     bool paused = true;
+    float startingTime = 14.0f;
     //bool debug = true;
     String message[3]={ "Press Enter", "Game Over", "0" };
     int score = 0;
@@ -53,7 +52,7 @@ int main()
     for (int i = 0; i<3; i++)
     {
         rndSpeeds[i] = GetRandomSpeed(9 * otherFraction , 10 * otherFraction);
-        //widthFraction+=0.355f;
+
         otherFraction += 4;
     }
 
@@ -123,8 +122,8 @@ int main()
     timeBarOutline.setOutlineColor(Color::Black);
     timeBarOutline.setOutlineThickness(7);
     Time gameTimeTotal;
-    float timeRemaining = 9.0f;
-    float timeBarWidthPerSecond = startWidth / timeRemaining;
+    float timeRemaining = startingTime;
+    float timeBarWidthPerSecond = startWidth / startingTime;
 
         // SETTING UP TEXTURES
     spriteBackground.setTexture(textureBackground);
@@ -142,7 +141,7 @@ int main()
         branches[i].setPosition(2000, 2000);
         branches[i].setOrigin(branches[i].getLocalBounds().width / 2, branches[i].getLocalBounds().height / 2);
     }
-        // Player, Gravestone and Axe also log
+        // Player, Gravestone, Axe and log
     spritePlayer.setTexture(texturePlayer);
     spritePlayer.setScale(defScale);
     spritePlayer.setOrigin(spritePlayer.getLocalBounds().width / 2, spritePlayer.getLocalBounds().height / 2);
@@ -152,9 +151,10 @@ int main()
     spriteGravestone.setOrigin(spriteGravestone.getLocalBounds().width / 2, spriteGravestone.getLocalBounds().height / 2);
     spriteGravestone.setPosition(spritePlayer.getPosition().x , spritePlayer.getPosition().y);
     spriteAxe.setTexture(textureAxe);
-    spriteAxe.setScale(defScale);
+    spriteAxe.setScale(axeScale);
     spriteAxe.setOrigin(spriteAxe.getLocalBounds().width / 2, spriteAxe.getLocalBounds().height / 2);
-    spriteAxe.setPosition(spritePlayer.getPosition().x + 40, spritePlayer.getPosition().y);
+    spriteAxe.setScale(spriteAxe.getScale().x * -1, spriteAxe.getScale().y);
+    spriteAxe.setPosition(spritePlayer.getPosition().x + 95, spritePlayer.getPosition().y - 20);
     spriteLog.setTexture(textureLog);
     spriteLog.setScale(defScale);
     spriteLog.setOrigin(spriteLog.getLocalBounds().width / 2, spriteLog.getLocalBounds().height / 2);
@@ -193,8 +193,8 @@ int main()
     spriteBackground.setPosition(0, 0);
     spriteBee.setPosition(vm.width / GetRandomSpeed(-1.0f, 10.0f), 350);
 
-    short cloudHeight = 0;
-    for (short i = 0; i < 3; i++)
+    int cloudHeight = 0;
+    for (int i = 0; i < 3; i++)
     {
         spriteCloud[i].setPosition(vm.width * widthFraction , cloudHeight);
         cloudHeight += 60;
@@ -209,7 +209,7 @@ int main()
         Time dt = clock.restart();
         clock.restart();
 
-        // HANDLE PLAYER INPUT
+        // = === = = ==  ==  = HANDLE PLAYER INPUT ---============
         sf::Event event;
         while (window.pollEvent(event))
         {
@@ -224,9 +224,9 @@ int main()
                 window.close();
         }
             // NEW GAME
-            if (Keyboard::isKeyPressed(Keyboard::Enter))
+            if (Keyboard::isKeyPressed(Keyboard::Enter) && paused)
             {
-                timeRemaining = 9.0f;
+                timeRemaining = startingTime;
                 score = 0;
                 paused = false;
 
@@ -241,24 +241,29 @@ int main()
                 spritePlayer.setPosition(vm.width / 2 - spritePlayer.getLocalBounds().width - 50, vm. height - 200);
                 playerSide = side::LEFT;
                 acceptInput = true;
+                spritePlayer.setScale(-defScale.x, defScale.y);
+                spriteAxe.setScale(-axeScale.x, axeScale.y);
             }
 
-            if (acceptInput)
+            if (acceptInput && !paused)
             {
                 if(Keyboard::isKeyPressed(Keyboard::Right))
-                {
-                    if (playerSide == side::LEFT)
+                {   // Mirror the player sprite
+                    if (playerSide == side::LEFT)   
                     {
+                        spriteAxe.setScale(spriteAxe.getScale().x * -1, spriteAxe.getScale().y);
                         spritePlayer.setScale(spritePlayer.getScale().x * -1, spritePlayer.getScale().y);
                     }
+                    // Actually change the player side
                     playerSide = side::RIGHT;
                     
                     score++;
                     timeRemaining += (2 / score) * .15;
                     spriteAxe.setPosition(AXE_POS_RIGHT, spriteAxe.getPosition().y);
                     spritePlayer.setPosition(vm.width / 2 + spritePlayer.getLocalBounds().width + 50, vm. height - 200);
-                    UpdateBranches(score);
-                    logXSpeed = -700;
+                    GenerateRandomBranches(score);
+                    spriteLog.setPosition(vm.width/2, (vm.height/2) + 200);
+                    logXSpeed = -5000;       // TODO could convert to a global var
                     logActive = true;
                     acceptInput = false;
 
@@ -267,6 +272,7 @@ int main()
                 {
                     if (playerSide == side::RIGHT)
                     {    
+                        spriteAxe.setScale(spriteAxe.getScale().x * -1, spriteAxe.getScale().y);
                         spritePlayer.setScale(spritePlayer.getScale().x * -1, spritePlayer.getScale().y);
                     }
                     playerSide = side::LEFT;
@@ -274,10 +280,11 @@ int main()
 
                     score++;
                     timeRemaining += (2 / score) * .15;
-                    spriteAxe.setPosition(AXE_POS_LEFT, spriteAxe.getPosition().y);
+                    spriteAxe.setPosition(AXE_POS_LEFT, spriteAxe.getPosition().y );
                     spritePlayer.setPosition(vm.width / 2 - spritePlayer.getLocalBounds().width - 50, vm. height - 200);
-                    UpdateBranches(score);
-                    logXSpeed = 700;
+                    GenerateRandomBranches(score);
+                    spriteLog.setPosition(vm.width/2, (vm.height/2) + 200);
+                    logXSpeed = 5000;
                     logActive = true;
                     acceptInput = false;
                 }
@@ -304,7 +311,7 @@ int main()
         {
             
             timeRemaining -= dt.asSeconds();
-            timeBar.setSize(Vector2f(timeRemaining * timeBarWidthPerSecond, timeBar.getSize().y));
+            timeBar.setSize(Vector2f(timeRemaining  * timeBarWidthPerSecond, timeBar.getSize().y));
             
             if (timeRemaining <= 0.0f)
             {
@@ -335,7 +342,19 @@ int main()
                 }
             }
             
+            // HANDLE THE FLYING LOG
+            if (logActive)
+            {
+                spriteLog.setPosition(spriteLog.getPosition().x + logXSpeed * dt.asSeconds(), spriteLog.getPosition().y + logYSpeed * dt.asSeconds());
+            }
 
+            // Has the log supassed the edge of the screen?
+            if (spriteLog.getPosition().x < -100 || spriteLog.getPosition().x > 2000)
+            {
+                logActive = false;
+                spriteLog.setPosition(2000, 2000);
+            }
+            // Has the player being squished by a branch?
 
 
             // Clouds
@@ -379,12 +398,12 @@ int main()
 
         window.draw(text[1]); // middle screem message
         window.draw(spriteBee);
-        window.draw(spriteAxe);
         window.draw(spriteGravestone);
         window.draw(spriteLog);
 
 
         window.draw(spritePlayer);
+        window.draw(spriteAxe);
         // BRACH
         for (int i = 0; i < NUM_BRANCHES; i++)
         {
@@ -407,14 +426,15 @@ int main()
     return 0;
 }
 
-    void UpdateBranches(int seed)
+    void GenerateRandomBranches(int seed)
     {
+            // Move branches one position down
         for (int i = NUM_BRANCHES - 1 ; i > 0; i--)
         {
             branchesPositions[i] = branchesPositions[i - 1];
         }
 
-        // Spawn a randowm branch at pos 0
+        // Spawn a randowm branch at pos 0 of the array
         // Left, right or none
         // make an int var instead
         srand((int)time(0) + seed);
