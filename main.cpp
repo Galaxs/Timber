@@ -20,13 +20,17 @@ const int NUM_BRANCHES = 6;
 enum class side { LEFT, RIGHT, NONE};
 side branchesPositions[NUM_BRANCHES];
 void GenerateRandomBranches(int seed);
+bool gameOver = false;
 int main()
 {
     
     // Windows objs
     VideoMode vm(VideoMode().getDesktopMode().width, VideoMode().getDesktopMode().height);
     sf::RenderWindow window(vm, "SFML works!", Style::Fullscreen);
+    window.setFramerateLimit(60);
 
+   
+    
     // Variables GENERAL
     Vector2f defScale(0.73f, 0.70f); // Scale to all textures
     Vector2f treesScale(0.46f, 0.65);
@@ -40,14 +44,16 @@ int main()
     bool acceptInput = true;
     bool paused = true;
     float startingTime = 14.0f;
-    //bool debug = true;
-    String message[3]={ "Press Enter", "Game Over", "0" };
+    
+    String message[4]={ "Press Enter", "Game Over", "0", "*SQUISHED!*" };
     int score = 0;
+    std:: stringstream ssScore;
+
     float widthFraction = -0.15f;
     int otherFraction = 1;
-    int beeMaxSpeed = 139.0f;
-    int beeMinSpeed = 210.9;
-    int beeSpeed = GetRandomSpeed(beeMaxSpeed, beeMinSpeed);
+    float beeMaxSpeed = 139.0f;
+    float beeMinSpeed = 210.9;
+    float beeSpeed = GetRandomSpeed(beeMaxSpeed, beeMinSpeed);
     int rndSpeeds[3];               // Clouds Speeds
     for (int i = 0; i<3; i++)
     {
@@ -62,12 +68,30 @@ int main()
     // Fonts & Text
     Font font;
     font.loadFromFile("./fonts/WABECK.otf");
-    // Text coordsText;
-    // coordsText.setCharacterSize(20);
-    // coordsText.setFillColor(Color::Green);
-    // coordsText.setFont(font);
-    Text text[2];  // "Press Enter", "Game Over", "0"
-    for (int i = 0; i < 2; i++)
+
+     /*        === DEBUG ==
+        In the followin chunck of code, will be to implement debug mode
+        that will include frame rate display and mouse coords to show in the screen
+        for develoment purpose.
+    */
+    bool debug = true;
+    Text debugTexts[2];                     // mouse and frameRate
+    for (short i = 0; i < 2; i++)
+    {
+        debugTexts[i].setCharacterSize(20);
+        debugTexts[i].setFillColor(Color::Green);
+        debugTexts[i].setFont(font);
+        debugTexts[i].setPosition(vm.width - debugTexts[i].getLocalBounds().width - 200, 50 + (i * 50));
+    }
+    // String mouseX = std::to_string(Mouse::getPosition().x);
+    std::stringstream ss;
+    
+ 
+
+
+    // CREATE 3 TEXT OBJECTS POPULATED BY ARRAY OF 3 STRINGS
+    Text text[4];  // "Press Enter", "Game Over", "0"
+    for (int i = 0; i <= 3; i++)
     {
         text[i].setString(message[i]);
         text[i].setFillColor(Color::White);
@@ -84,7 +108,7 @@ int main()
 
         text[i].setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f);
 
-        text[i].setPosition(vm.width / 2, vm.height / 2) ;
+        text[i].setPosition(vm.width / 2.0f, vm.height / 2.0f);
     }
     
 
@@ -226,6 +250,7 @@ int main()
             // NEW GAME
             if (Keyboard::isKeyPressed(Keyboard::Enter) && paused)
             {
+                gameOver = false;
                 timeRemaining = startingTime;
                 score = 0;
                 paused = false;
@@ -243,6 +268,11 @@ int main()
                 acceptInput = true;
                 spritePlayer.setScale(-defScale.x, defScale.y);
                 spriteAxe.setScale(-axeScale.x, axeScale.y);
+            }
+
+            if (Keyboard::isKeyPressed(Keyboard::D))
+            {
+                debug = !debug;
             }
 
             if (acceptInput && !paused)
@@ -299,12 +329,7 @@ int main()
 
 
 
-            // TEST //
-        // std::stringstream ss;
-        // ss << "X: " << Mouse::getPosition().x << " Y: "  << Mouse::getPosition().y;
-        // coordsText.setString(ss.str());
-        // coordsText.setPosition(vm.width / 2 - 40, vm.height / 2 - 40);
-
+       
 
         // UPDATE SCREEN
         if (!paused)
@@ -318,10 +343,19 @@ int main()
                 paused = true;
                 text[0].setString(message[1]);
             }
-            std:: stringstream ss;
-            ss << score;                        // <---- TO BE COMMENTED AS NEEDED
-            text[1].setString(ss.str());
 
+            //      ===== UI SCORE ========
+            ssScore.str("");
+            ssScore << score;
+            text[1].setString(ssScore.str());
+
+            //      ===== UI DEBUG =======
+            if (debug)
+            {
+                ss.str("");
+                ss << "x: " << Mouse::getPosition().x << " y: " << Mouse::getPosition().y << std::endl;
+                debugTexts[0].setString(ss.str());
+            }   
             // Branches
             for (int i = 0; i < NUM_BRANCHES; i++)
             {
@@ -354,7 +388,33 @@ int main()
                 logActive = false;
                 spriteLog.setPosition(2000, 2000);
             }
+
             // Has the player being squished by a branch?
+            if (playerSide == branchesPositions[5])
+            {
+                // Death
+                paused = true;
+                acceptInput = false;
+                gameOver = true;
+
+                // Draw the gravestone
+                spriteGravestone.setPosition(spritePlayer.getPosition().x, spritePlayer.getPosition().y + 20);
+
+                // Hide the player, log and Axe
+                spritePlayer.setPosition(2000, spritePlayer.getPosition().y);
+                spriteAxe.setPosition(2000, spriteAxe.getPosition().y);
+                spriteLog.setPosition(2000, spriteLog.getPosition().y);
+
+                // // Change the text of the message
+                // text[0].setString(message[3]);
+
+                // // Center it on the screen
+                // FloatRect textRect = text[2].getLocalBounds();
+                
+                // text[2].setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f);
+                // text[2].setPosition(vm.width / 2.0f, vm.height / 2.0f); 
+
+            }
 
 
             // Clouds
@@ -416,10 +476,25 @@ int main()
          
         window.draw(timeBar);
         window.draw(timeBarOutline);
-        if (paused)                     // TODO ADD CONDITION FOR GAME OVER
+        if (paused && !gameOver)                     // TODO ADD CONDITION FOR GAME OVER
         {
             window.draw(text[0]);
         }
+        else if (gameOver)      // draw squished!
+        {
+            window.draw(text[3]);
+        }
+
+        if (debug)
+        {
+            for (short i = 0; i < 2; i++)
+            {
+                window.draw(debugTexts[i]);
+            }
+        
+        }
+        
+
         window.display(); // Display all drawed
     }
 

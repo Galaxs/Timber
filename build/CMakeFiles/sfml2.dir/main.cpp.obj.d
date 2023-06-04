@@ -1,13 +1,13 @@
 CMakeFiles/sfml2.dir/main.cpp.obj: \
  C:\Users\Manu\Documents\reps\sfml2\main.cpp \
- C:/msys64/mingw64/include/c++/12.2.0/iostream \
+ C:/msys64/mingw64/include/c++/12.2.0/sstream \
+ C:/msys64/mingw64/include/c++/12.2.0/istream \
+ C:/msys64/mingw64/include/c++/12.2.0/ios \
+ C:/msys64/mingw64/include/c++/12.2.0/iosfwd \
  C:/msys64/mingw64/include/c++/12.2.0/x86_64-w64-mingw32/bits/c++config.h \
  C:/msys64/mingw64/include/c++/12.2.0/x86_64-w64-mingw32/bits/os_defines.h \
  C:/msys64/mingw64/include/c++/12.2.0/x86_64-w64-mingw32/bits/cpu_defines.h \
  C:/msys64/mingw64/include/c++/12.2.0/pstl/pstl_config.h \
- C:/msys64/mingw64/include/c++/12.2.0/ostream \
- C:/msys64/mingw64/include/c++/12.2.0/ios \
- C:/msys64/mingw64/include/c++/12.2.0/iosfwd \
  C:/msys64/mingw64/include/c++/12.2.0/bits/stringfwd.h \
  C:/msys64/mingw64/include/c++/12.2.0/bits/memoryfwd.h \
  C:/msys64/mingw64/include/c++/12.2.0/bits/postypes.h \
@@ -127,9 +127,11 @@ CMakeFiles/sfml2.dir/main.cpp.obj: \
  C:/msys64/mingw64/include/c++/12.2.0/x86_64-w64-mingw32/bits/ctype_inline.h \
  C:/msys64/mingw64/include/c++/12.2.0/bits/locale_facets.tcc \
  C:/msys64/mingw64/include/c++/12.2.0/bits/basic_ios.tcc \
+ C:/msys64/mingw64/include/c++/12.2.0/ostream \
  C:/msys64/mingw64/include/c++/12.2.0/bits/ostream.tcc \
- C:/msys64/mingw64/include/c++/12.2.0/istream \
  C:/msys64/mingw64/include/c++/12.2.0/bits/istream.tcc \
+ C:/msys64/mingw64/include/c++/12.2.0/bits/sstream.tcc \
+ C:/msys64/mingw64/include/c++/12.2.0/iostream \
  C:/msys64/mingw64/include/c++/12.2.0/SFML/Graphics.hpp \
  C:/msys64/mingw64/include/c++/12.2.0/SFML/Window.hpp \
  C:/msys64/mingw64/include/c++/12.2.0/SFML/System.hpp \
@@ -236,5 +238,23 @@ CMakeFiles/sfml2.dir/main.cpp.obj: \
  C:/msys64/mingw64/include/c++/12.2.0/SFML/Graphics/Sprite.hpp \
  C:/msys64/mingw64/include/c++/12.2.0/SFML/Graphics/Text.hpp \
  C:/msys64/mingw64/include/c++/12.2.0/SFML/Graphics/VertexBuffer.hpp \
- C:/msys64/mingw64/include/c++/12.2.0/sstream \
- C:/msys64/mingw64/include/c++/12.2.0/bits/sstream.tcc
+ C:/msys64/mingw64/include/c++/12.2.0/SFML/Audio.hpp \
+ C:/msys64/mingw64/include/c++/12.2.0/SFML/Audio/InputSoundFile.hpp \
+ C:/msys64/mingw64/include/c++/12.2.0/SFML/Audio/Export.hpp \
+ C:/msys64/mingw64/include/c++/12.2.0/SFML/Audio/Listener.hpp \
+ C:/msys64/mingw64/include/c++/12.2.0/SFML/Audio/Music.hpp \
+ C:/msys64/mingw64/include/c++/12.2.0/SFML/Audio/SoundStream.hpp \
+ C:/msys64/mingw64/include/c++/12.2.0/SFML/Audio/SoundSource.hpp \
+ C:/msys64/mingw64/include/c++/12.2.0/SFML/Audio/AlResource.hpp \
+ C:/msys64/mingw64/include/c++/12.2.0/SFML/Audio/OutputSoundFile.hpp \
+ C:/msys64/mingw64/include/c++/12.2.0/SFML/Audio/Sound.hpp \
+ C:/msys64/mingw64/include/c++/12.2.0/SFML/Audio/SoundBuffer.hpp \
+ C:/msys64/mingw64/include/c++/12.2.0/set \
+ C:/msys64/mingw64/include/c++/12.2.0/bits/stl_set.h \
+ C:/msys64/mingw64/include/c++/12.2.0/bits/stl_multiset.h \
+ C:/msys64/mingw64/include/c++/12.2.0/SFML/Audio/SoundBufferRecorder.hpp \
+ C:/msys64/mingw64/include/c++/12.2.0/SFML/Audio/SoundRecorder.hpp \
+ C:/msys64/mingw64/include/c++/12.2.0/SFML/Audio/SoundFileFactory.hpp \
+ C:/msys64/mingw64/include/c++/12.2.0/SFML/Audio/SoundFileFactory.inl \
+ C:/msys64/mingw64/include/c++/12.2.0/SFML/Audio/SoundFileReader.hpp \
+ C:/msys64/mingw64/include/c++/12.2.0/SFML/Audio/SoundFileWriter.hpp
