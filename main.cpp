@@ -2,6 +2,7 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
+#include <iomanip>
 
 
 using namespace sf;
@@ -36,8 +37,8 @@ int main()
     Vector2f treesScale(0.46f, 0.65);
     Vector2f axeScale(0.34, 0.34);
     side playerSide = side::LEFT;
-    const float AXE_POS_LEFT = 585;
-    const float AXE_POS_RIGHT = 800;
+    const float AXE_POS_LEFT = 570;
+    const float AXE_POS_RIGHT = 795;
     float logXSpeed = 700;
     float logYSpeed =  -1100;
     bool logActive = false;
@@ -74,6 +75,8 @@ int main()
         that will include frame rate display and mouse coords to show in the screen
         for develoment purpose.
     */
+    int uiUpdateInterval = 1;
+    float fps;
     bool debug = true;
     Text debugTexts[2];                     // mouse and frameRate
     for (short i = 0; i < 2; i++)
@@ -84,7 +87,8 @@ int main()
         debugTexts[i].setPosition(vm.width - debugTexts[i].getLocalBounds().width - 200, 50 + (i * 50));
     }
     // String mouseX = std::to_string(Mouse::getPosition().x);
-    std::stringstream ss;
+    std::stringstream ss;                   // for mouse position
+    std::stringstream ss2;                  // for formating the FrameRate
     
  
 
@@ -110,6 +114,22 @@ int main()
 
         text[i].setPosition(vm.width / 2.0f, vm.height / 2.0f);
     }
+
+    // ======= SOUNDS =========
+    SoundBuffer soundBuffers[3];        // chop, squished and out of time
+    Sound sounds[3];
+    soundBuffers[0].loadFromFile("./sound/chop.wav");
+    soundBuffers[1].loadFromFile("./sound/death.wav");
+    soundBuffers[2].loadFromFile("./sound/out_of_time.wav");
+    for (short i = 0; i < 3; i++)       // set all sounds with the above arr of buffers
+    {
+        sounds[i].setBuffer(soundBuffers[i]);
+    }
+
+
+    
+    
+
     
 
     Texture textureBackground, textureCloud, textureBee, textureTree, textureBranch, texturePlayer, textureGravestone, textureAxe, textureLog;
@@ -178,15 +198,16 @@ int main()
     spriteAxe.setScale(axeScale);
     spriteAxe.setOrigin(spriteAxe.getLocalBounds().width / 2, spriteAxe.getLocalBounds().height / 2);
     spriteAxe.setScale(spriteAxe.getScale().x * -1, spriteAxe.getScale().y);
-    spriteAxe.setPosition(spritePlayer.getPosition().x + 95, spritePlayer.getPosition().y - 20);
+    spriteAxe.setPosition(AXE_POS_LEFT, spritePlayer.getPosition().y - 20);
     spriteLog.setTexture(textureLog);
     spriteLog.setScale(defScale);
     spriteLog.setOrigin(spriteLog.getLocalBounds().width / 2, spriteLog.getLocalBounds().height / 2);
     spriteLog.setPosition(vm.width / 2, spriteTree[0].getGlobalBounds().height - (spriteLog.getLocalBounds().height / 2));
 
-        // Setting the scale
+        // ===== Setting the scale =====
     spriteBackground.setScale(0.73f, 0.70f);
 
+    // BUNCH OF TREE IN THE BACKGROUND
     int ytree  = 20;
     int xtree  = 30;
     for (short i = 0; i < 12; i++)
@@ -213,7 +234,7 @@ int main()
     
     spriteBee.setScale(defScale);
         
-        // Setting the pos =============================================
+        // Setting the pos of the background
     spriteBackground.setPosition(0, 0);
     spriteBee.setPosition(vm.width / GetRandomSpeed(-1.0f, 10.0f), 350);
 
@@ -231,7 +252,22 @@ int main()
     {
         // Updatable Variables
         Time dt = clock.restart();
-        clock.restart();
+        
+        // For DEBUG
+       if (uiUpdateInterval >= 40)
+       {
+            fps = 1.0f /  dt.asSeconds();
+            ss2.str("");
+            ss2 << std::fixed << std::setprecision(0) << fps; // format the fps to 1 floating decimal point
+            debugTexts[1].setString(ss2.str());  
+            uiUpdateInterval = 0;             // put it in a text object for display
+       } 
+       uiUpdateInterval++;
+       
+        
+       
+
+        
 
         // = === = = ==  ==  = HANDLE PLAYER INPUT ---============
         sf::Event event;
@@ -296,6 +332,7 @@ int main()
                     logXSpeed = -5000;       // TODO could convert to a global var
                     logActive = true;
                     acceptInput = false;
+                    sounds[0].play();
 
                 }
                 if (Keyboard::isKeyPressed(Keyboard::Left))
@@ -317,6 +354,8 @@ int main()
                     logXSpeed = 5000;
                     logActive = true;
                     acceptInput = false;
+
+                    sounds[0].play();
                 }
                 
             }
@@ -324,12 +363,11 @@ int main()
 
 
 
-        //  ------------------ UPDATE ----------------------------------
-            
+/*
+   ------------------ UPDATE ----------------------------------
+*/
 
-
-
-       
+      
 
         // UPDATE SCREEN
         if (!paused)
@@ -342,6 +380,7 @@ int main()
             {
                 paused = true;
                 text[0].setString(message[1]);
+                sounds[2].play();
             }
 
             //      ===== UI SCORE ========
@@ -350,6 +389,7 @@ int main()
             text[1].setString(ssScore.str());
 
             //      ===== UI DEBUG =======
+            // MOUSE POS UPDATE
             if (debug)
             {
                 ss.str("");
@@ -396,6 +436,7 @@ int main()
                 paused = true;
                 acceptInput = false;
                 gameOver = true;
+                sounds[1].play();
 
                 // Draw the gravestone
                 spriteGravestone.setPosition(spritePlayer.getPosition().x, spritePlayer.getPosition().y + 20);
@@ -490,6 +531,7 @@ int main()
             for (short i = 0; i < 2; i++)
             {
                 window.draw(debugTexts[i]);
+                
             }
         
         }
